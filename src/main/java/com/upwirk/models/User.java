@@ -21,6 +21,11 @@ public class User {
     private Rates rates;
     private Double averageRating;
     private Date createdAt;
+    private Date updatedAt;
+
+    public void setUpdatedAt(Date updatedAt) {
+        this.updatedAt = updatedAt;
+    }
 
     public Long getId() {
         return id;
@@ -116,5 +121,9 @@ public class User {
 
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public Date getUpdatedAt() {
+        return updatedAt;
     }
 }
