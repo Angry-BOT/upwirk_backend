@@ -14,8 +14,7 @@ public interface CreateUserService {
             String userType,
             String bio,
             List<SocialMediaProfiles> socialMediaProfiles,
-            Rates rates);
-
+            List<Rates> rates) throws Exception;
 
     // Other user management methods
 }

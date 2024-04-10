@@ -1,39 +1,53 @@
 package com.upwirk.upwirk_backend.controller;
 
-import com.upwirk.upwirk_backend.implementation.CreateUserServiceResponse;
-import com.upwirk.upwirk_backend.models.Rates;
-import com.upwirk.upwirk_backend.models.SocialMediaProfiles;
+import com.upwirk.upwirk_backend.core.Sanity;
+import com.upwirk.upwirk_backend.exceptions.UpwirdException;
+import com.upwirk.upwirk_backend.request.CreateUserServiceRequest;
 import com.upwirk.upwirk_backend.models.User;
 import com.upwirk.upwirk_backend.implementation.CreateUserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.io.IOException;
-import java.util.List;
-
 @RestController
 @RequestMapping("/api/v1/create")
 public class CreateUserServiceController {
+    public final String SUCCESS_MSG = "User registered successfully";
     @Autowired
     public CreateUserServiceImpl userService;
+    @Autowired
+    public Sanity sanity;
     /*@PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)*/
-    public ResponseEntity<CreateUserServiceResponse> createProfile(
-            @RequestParam String name,
-            @RequestParam String email,
-            @RequestParam String password,
-            @RequestParam String userType,
-            @RequestParam String bio,
-            @RequestParam(required = false) List<SocialMediaProfiles> socialMediaProfiles,
-            @RequestParam(required = false) Rates rates
-            /*@RequestPart(name = "images", required = false) List<MultipartFile> images*/) throws IOException {
-
-        /*// Check if user is already registered as a client (not allowed to create artist profile)
-        if (currentUser.getUserType() == UserType.CLIENT) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }*/
-        User user = userService.createUserProfile(name, email, password, userType, bio, socialMediaProfiles, rates);
-        CreateUserServiceResponse response = new CreateUserServiceResponse(user.getId());
-        return ResponseEntity.ok(response);
+    @PostMapping
+    public ResponseEntity<String> createProfile(
+            @RequestBody CreateUserServiceRequest request
+            /*@RequestPart(name = "images", required = false) List<MultipartFile> images*/) {
+        try {
+            // Validate mandatory fields
+            if (sanity.isNullOrEmpty(request.getName()) ||
+                    sanity.isNullOrEmpty(request.getEmail()) ||
+                    sanity.isNullOrEmpty(request.getPassword()) ||
+                    sanity.isNullOrEmpty(request.getUserType())) {
+                throw new UpwirdException("Missing required fields: name, email, password, userType, bio");
+            }
+            // Check if user already has a user profile (assuming email is not null)
+            if (userService.existsByEmail(request.getEmail())) {
+                throw new UpwirdException("User already has a profile with the email");
+            }
+            User user = userService.createUserProfile(
+                    request.getName(),
+                    request.getEmail(),
+                    request.getPassword(),
+                    request.getUserType(),
+                    request.getBio(),
+                    request.getSocialMediaProfiles(),
+                    request.getRates()
+            );
+            return ResponseEntity.ok(SUCCESS_MSG);
+        } catch (UpwirdException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     }
-
 }

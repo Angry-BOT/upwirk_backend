@@ -2,7 +2,9 @@ package com.upwirk.upwirk_backend;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-@SpringBootApplication
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
+
+@SpringBootApplication(exclude = { SecurityAutoConfiguration.class })
 public class UpwirkBackendApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(UpwirkBackendApplication.class, args);
