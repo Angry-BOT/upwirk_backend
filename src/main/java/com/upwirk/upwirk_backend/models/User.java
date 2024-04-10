@@ -1,29 +1,39 @@
 package com.upwirk.upwirk_backend.models;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.ColumnDefault;
+
 import java.util.Date;
 @Entity
 @Table(name = "users")
-public class User extends SanityFields{
+public class User{
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "name")
+    @Column(name = "name", nullable = false)
     private String name;
-    @Column(name = "email")
+    @Column(name = "email", unique = true, nullable = false)
     private String email;
-    @Column(name = "password")
-    private String password;
-    @Column(name = "user_type")// Hashed password
-    private String userType;
-    @Column(name = "bio")// Enum (CLIENT, ARTIST)
+    @Column(name = "password", nullable = false)
+    private String password;// Hashed password
+    @Column(name = "user_type", nullable = false)
+    private String userType;// Enum (CLIENT, ARTIST)
+    @Column(name = "bio", nullable = true)
     private String bio;
     @ManyToOne
     @JoinColumn(name = "fk_category_id", referencedColumnName = "id")
     private Category category; // Foreign key referencing categories table
-    @ManyToOne
-    @JoinColumn(name = "fk_rate_id", referencedColumnName = "id")
-    private Rates rates; // Foreign key referencing rates table
+    @Column(name = "created_at", nullable = false)
+    private Date createdAt;
+    @Column(name = "created_by", nullable = false)
+    private String createdBy;
+    @Column(name = "updated_at", nullable = false)
+    private Date updatedAt;
+    @Column(name = "updated_by", nullable = false)
+    private String updatedBy;
+    @Column(name = "isDeleted", nullable = false)
+    @ColumnDefault("false")
+    private boolean deleted;
 
     public Long getId() {
         return id;
@@ -67,11 +77,52 @@ public class User extends SanityFields{
     public void setBio(String bio) {
         this.bio = bio;
     }
-    public Rates getRates() {
-        return rates;
-    }
-    public void setRates(Rates rates) {
-        this.rates = rates;
+
+    public Category getCategory() {
+        return category;
     }
 
+    public void setCategory(Category category) {
+        this.category = category;
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public Date getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Date updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public String getUpdatedBy() {
+        return updatedBy;
+    }
+
+    public void setUpdatedBy(String updatedBy) {
+        this.updatedBy = updatedBy;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
 }

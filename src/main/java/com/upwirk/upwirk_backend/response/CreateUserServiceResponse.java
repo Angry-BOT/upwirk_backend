@@ -1,4 +1,4 @@
-package com.upwirk.upwirk_backend.implementation;
+package com.upwirk.upwirk_backend.response;
 
 public class CreateUserServiceResponse {
     private Long userId;
