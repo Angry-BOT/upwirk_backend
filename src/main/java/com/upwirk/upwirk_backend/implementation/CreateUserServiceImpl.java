@@ -1,5 +1,6 @@
 package com.upwirk.upwirk_backend.implementation;
 
+import com.upwirk.upwirk_backend.controller.CreateUserServiceController;
 import com.upwirk.upwirk_backend.core.PasswordEncoder;
 import com.upwirk.upwirk_backend.models.Rates;
 import com.upwirk.upwirk_backend.models.SocialMediaProfiles;
@@ -9,6 +10,8 @@ import com.upwirk.upwirk_backend.repositories.SocialMediaProfilesRepository;
 import com.upwirk.upwirk_backend.repositories.UserRepository;
 import com.upwirk.upwirk_backend.services.CreateUserService;
 import jakarta.persistence.EntityManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.Date;
@@ -25,6 +28,7 @@ public class CreateUserServiceImpl implements CreateUserService {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private EntityManager entityManager;
+    Logger logger = LoggerFactory.getLogger(CreateUserServiceImpl.class);
     public boolean existsByEmail(String email) {
         return !entityManager.createQuery("SELECT u.email FROM User u WHERE u.email = :email")
                 .setParameter("email", email)
@@ -37,6 +41,7 @@ public class CreateUserServiceImpl implements CreateUserService {
         User user = new User();
         try {
             // Save user information with proper setters
+            logger.debug("Saving User Object for New User : " + name);
             user.setName(name);
             user.setEmail(email);
             user.setPassword(passwordEncoder.encode(password));
@@ -47,8 +52,10 @@ public class CreateUserServiceImpl implements CreateUserService {
             user.setCreatedBy(name);
             user.setUpdatedBy(name);
             userRepository.save(user);
+            logger.debug("Saved User Object successfully for New User : " + name);
             // Handle rates (if rates is not null)
             if (rates != null) {
+                logger.debug("Saving Rates Object for New User : " + name + " Id : " + user.getId());
                 rates.stream()
                         .map(inputRate -> {
                             Rates userRates = new Rates();
@@ -62,9 +69,11 @@ public class CreateUserServiceImpl implements CreateUserService {
                             return userRates;
                         })
                         .forEach(ratesRepository::save);
+                logger.debug("Saved Rates Object successfully for New User : " + name + " Id : " + user.getId());
             }
             // Handle social media profiles (if socialMediaProfiles is not null)
             if (socialMediaProfiles != null) {
+                logger.debug("Saving Social Media Profiles Object for New User : " + name + " Id : " + user.getId());
                 socialMediaProfiles.stream()
                         .map(inputProfile -> {
                             SocialMediaProfiles userProfiles = new SocialMediaProfiles();
@@ -79,6 +88,7 @@ public class CreateUserServiceImpl implements CreateUserService {
                             return userProfiles;
                         })
                         .forEach(socialMediaProfilesRepository::save);
+                logger.debug("Saved Social Media Profiles Object successfully for New User : " + name + " Id : " + user.getId());
             }
             return user;
         } catch (Exception e) {
