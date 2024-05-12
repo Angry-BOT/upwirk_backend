@@ -1,19 +1,34 @@
 package com.upwirk.upwirk_backend.models;
 
+import java.time.LocalDateTime;
 import jakarta.persistence.*;
 import org.hibernate.annotations.ColumnDefault;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
-@Entity
-@Table(name = "categories")
-public class Category{
+public class Messages {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private int id;
 
-    @Column(name = "name")
-    private String name;
+    @OneToOne
+    @JoinColumn(name = "sender_id", referencedColumnName = "id")
+    private User sender;
+
+    @OneToOne
+    @JoinColumn(name = "recipient_id", referencedColumnName = "id")
+    private User recipient;
+
+    @Column(name = "content")
+    private String content;
+
+    @Column(name = "sent_at")
+    private LocalDateTime sentAt;
 
     @Column(name = "created_at", nullable = false)
     private Date createdAt;
@@ -30,21 +45,45 @@ public class Category{
     @Column(name = "isDeleted", nullable = false)
     @ColumnDefault("false")
     private boolean deleted;
-    
-    public Long getId() {
+
+    public int getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(int id) {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public User getSender() {
+        return sender;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setSenderId(User sender) {
+        this.sender = sender;
+    }
+
+    public User getRecipient() {
+        return recipient;
+    }
+
+    public void setRecipientId(User recipient) {
+        this.recipient = recipient;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public LocalDateTime getSentAt() {
+        return sentAt;
+    }
+
+    public void setSentAt(LocalDateTime sentAt) {
+        this.sentAt = sentAt;
     }
 
     public Date getCreatedAt() {
@@ -87,3 +126,4 @@ public class Category{
         this.deleted = deleted;
     }
 }
+
